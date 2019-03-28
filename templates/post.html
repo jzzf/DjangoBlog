@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load comment_tags %}
+{% block content %}
+
+
+<style>
+    .post-body img {
+        width: 100%;
+    }
+    div.comment {
+        margin-bottom: 0.5em;
+    }
+
+    div.reply {
+        margin-left: 4em;
+    }
+
+    .card-signin .card-title {
+      margin-bottom: 2rem;
+      font-weight: 300;
+      font-size: 1.5rem;
+    }
+
+</style>
+
+
+<div class="container">
+    <div class="row">
+        <!-- Latest Posts -->
+        <main class="post blog-post col-lg-8">
+            <div class="container">
+                <div class="post-single">
+                    <div class="post-thumbnail"><img src="{{ post.thumbnail.url }}" alt="..." class="img-fluid"></div>
+                    <div class="post-details">
+                        <div class="post-meta d-flex justify-content-between">
+                            <div class="category">
+                                {% for cat in title.categories.all %}
+                                    <a href="#">{{ cat }}</a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <h1>{{ post.title }}<a href="#"><i class="fa fa-bookmark-o"></i></a></h1>
+                        <div class="post-footer d-flex align-items-center flex-column flex-sm-row"><a href="#" class="author d-flex align-items-center flex-wrap">
+                            <div class="avatar"><img src="{{ post.author.profile_picture.url }}" alt="..." class="img-fluid"></div>
+                            <div class="title"><span>{{ post.author.user.username }}</span></div></a>
+                            <div class="d-flex align-items-center flex-wrap">
+                                <div class="date"><i class="icon-clock"></i> {{ post.timestamp | timesince }} ago</div>
+                                <div class="views"><i class="icon-eye"></i> {{ post.get_read_num }}</div>
+                                {% get_comment_count post as count %}
+                                <div class="comments meta-last"><i class="icon-comment"></i>{{ count }}</div>
+                            </div>
+                        </div>
+                        <div class="post-body">
+                            {{ post.content | safe }}
+                        </div>
+
+                        <div class="posts-nav d-flex justify-content-between align-items-stretch flex-column flex-md-row">
+                            {% if previous_post %}
+                            <a href="{{ previous_post.get_absolute_url }}" class="prev-post text-left d-flex align-items-center">
+                                <div class="icon prev"><i class="fa fa-angle-left"></i></div>
+                                <div class="text"><strong class="text-primary">Previous Post </strong></div>
+                            </a>
+                            {% endif %}
+                            {% if next_post %}
+                            <a href="{{ next_post.get_absolute_url }}" class="next-post text-right d-flex align-items-center justify-content-end">
+                                <div class="text"><strong class="text-primary">Next Post </strong></div>
+                                <div class="icon next"><i class="fa fa-angle-right">   </i></div>
+                            </a>
+                            {% endif %}
+                        </div>
+                        <!-- Display Comment -->
+                        <div class="post-comments">
+                            <header>
+                                <h3 class="h6">Post Comments<span class="no-of-comments">({{ count }})</span></h3>
+                            </header>
+                            <div class="comment" id="comment_list">
+                                {% get_comment_list post as comments %}
+                                {% for comment in comments %}
+                                    <div id="root_{{ comment.pk }}">
+                                        <div class="comment-header d-flex justify-content-between">
+                                            <div class="user d-flex align-items-center">
+                                                <div class="image"><img src="{% static 'img/user.svg' %}" alt="..." class="img-fluid rounded-circle"></div>
+                                                <div class="title"><strong>{{ comment.user.username }}</strong><span class="date">{{ comment.comment_time }}</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="comment-body" id="comment_{{ comment.pk }}">
+                                            <p>{{ comment.text|safe }}</p>
+                                            <a href="javascript:reply({{ comment.pk }});">Reply</a>
+                                        </div>
+
+
+                                        {% for reply in comment.root_comment.all %}
+                                            <div class="reply">
+                                                <div class="comment-header d-flex justify-content-between">
+                                                    <div class="user d-flex align-items-center">
+                                                        <div class="image"><img src="{% static 'img/user.svg' %}" alt="..." class="img-fluid rounded-circle"></div>
+                                                        <div class="title"><strong>{{ reply.user.username }}</strong><span class="date">{{ reply.comment_time }}</span></div>
+                                                    </div>
+                                                </div>
+                                                <div class="comment-body" id="comment_{{ reply.pk }}">
+                                                    {{ reply.text|safe }}
+                                                    <a href="javascript:reply({{ reply.pk }});">Reply</a>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                 {% empty %}
+                                    <span id="no_comment"></span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <!-- Add Comment -->
+                        <div class="add-comment">
+                            <header>
+                                <h3 class="h6">Leave a reply</h3>
+                            </header>
+                            {% if user.is_authenticated %}
+                            <form id="comment_form" action="{% url 'update_comment' %}" class="commenting-form" method="POST">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div id="reply_content_container" style="display: none;">
+                                        <p>Reply: </p>
+                                        <div id="reply_content"></div>
+                                    </div>
+                                    {% get_comment_form post as comment_form %}
+                                    {% for field in comment_form %}
+                                        <div class="form-group col-md-12">
+                                            {{ field }}
+                                        </div>
+                                    {% endfor %}
+                                    <div class="form-group col-md-12">
+                                        <button type="submit" class="btn btn-secondary">Submit Comment</button>
+                                    </div>
+                                </div>
+                            </form>
+                            {% else %}
+
+                                <a class="btn btn-info" href="{% url 'login' %}?from={{ request.get_full_path }}">
+                                    SIGN IN
+                                </a>
+
+                                <a class="btn btn-info" href="{% url 'register' %}?from={{ request.get_full_path }}">SIGN UP</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        {% include 'sidebar.html' with most_recent=most_recent category_count=category_count %}
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    String.prototype.format = function(){
+        var str = this;
+        for (var i = 0; i < arguments.length; i++){
+            var str = str.replace(new RegExp('\\{' + i + '\\}', 'g'), arguments[i])
+        };
+        return str;
+    }
+
+    function reply(reply_comment_id){
+        $('#reply_comment_id').val(reply_comment_id);
+        var html = $('#comment_' + reply_comment_id).html();
+        $('#reply_content').html(html);
+        $('#reply_content_container').show();
+
+        $('html').animate({scrollTop: $('#comment_form').offset().top - 70}, 300, function(){
+            CKEDITOR.instances['id_text'].focus();
+        })
+    }
+
+    function numFormat(num){
+        return ('00' + num).substr(-2);
+    }
+
+    function timeFormat(timestamp){
+        var datetime = new Date(timestamp * 1000);
+        var year = datetime.getFullYear();
+        var month = numFormat(datetime.getMonth() + 1);
+        var day = numFormat(datetime.getDate());
+        var hour = numFormat(datetime.getHours());
+        var minute = numFormat(datetime.getMinutes());
+        var second = numFormat(datetime.getSeconds());
+        return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+    }
+
+    $('#comment_form').submit(function(){
+        $('#comment_error').text('');
+
+        CKEDITOR.instances['id_text'].updateElement();
+
+        if(CKEDITOR.instances['id_text'].document.getBody().getText().trim()==''){
+            $('#comment_error').text('Comment can not be blank');
+            return false;
+        }
+
+        $.ajax({
+            url: "{% url 'update_comment' %}",
+            type: 'POST',
+            data: $(this).serialize(),
+            cache: false,
+            success: function(data){
+                console.log(data);
+                if(data['status'] == 'SUCCESS'){
+
+
+                    if ($('#reply_comment_id').val() == 0){
+                        // insert comment
+
+                        var comment_html = '<div id="root_{0}">' +
+                            '<div class="comment-header d-flex justify-content-between">' +
+                            '<div class="user d-flex align-items-center">' +
+                            '<div class="image"><img src="{% static 'img/user.svg' %}" alt="..." class="img-fluid rounded-circle"></div>' +
+                            '<div class="title"><strong>{1}</strong><span class="date">{2}</span></div>' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="comment-body" id="comment_{0}">' +
+                            '<p>{3}</p>' +
+                            '<a href="javascript:reply({0});">Reply</a>' +
+                            '</div>' +
+                            '</div>'
+                        comment_html = comment_html.format(data['pk'], data['username'], timeFormat(data['comment_time']), data['text']);
+                        $('#comment_list').prepend(comment_html);
+                    }else{
+                        // insert reply
+
+                        var reply_html = '<div class="reply">' +
+                                    '<div class="comment-header d-flex justify-content-between">' +
+                                    '<div class="user d-flex align-items-center">' +
+                                    '<div class="image"><img src="{% static 'img/user.svg' %}" alt="..." class="img-fluid rounded-circle"></div>' +
+                                    '<div class="title"><strong>{1}</strong><span class="date">{2}</span></div>' +
+                                    '</div>' +
+                                    '</div>' +
+                                    '<div class="comment-body" id="comment_{0}">' +
+                                    '<p>{4}</p>' +
+                                    '<a href="javascript:reply({0}});">Reply</a>' +
+                                    '</div>' +
+                                    '</div>'
+
+                        reply_html = reply_html.format(data['pk'], data['username'], timeFormat(data['comment_time']), data['reply_to'], data['text']);
+                        $("#root_" + data['root_pk']).append(reply_html);
+                    }
+
+                    CKEDITOR.instances['id_text'].setData('');
+                    $('#reply_content_container').hide();
+                    $('#reply_comment_id').val('0');
+                    $('#no_comment').remove();
+
+                }else{
+                    $('#comment_error').text(data['message']);
+                }
+            },
+            error: function(xhr){
+                console.log(xhr);
+            }
+        });
+        return false;
+    });
+
+
+
+
+</script>
+
+
+{% endblock content %}
