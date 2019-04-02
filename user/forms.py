@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class LoginForm(forms.Form):
     username_or_email = forms.CharField(label='username or email', widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'username'}))
+        attrs={'class': 'form-control'}))
     password = forms.CharField(label='password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
     def clean(self):
@@ -186,17 +186,16 @@ class ChangePasswordForm(forms.Form):
 
 class ForgotPasswordForm(forms.Form):
     email = forms.EmailField(label='Email',
-                             widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Input email'}))
+                             widget=forms.EmailInput(attrs={'class': 'form-control'}))
 
     verification_code = forms.CharField(label='Verification code',
                                         required=False,
-                                        widget=forms.TextInput(attrs={'class': 'form-control',
-                                                                      'placeholder': 'click to send verification code'}))
+                                        widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     new_password = forms.CharField(label='new password',
                                    max_length=20,
                                    widget=forms.TextInput(
-                                       attrs={'class': 'form-control', 'placeholder': 'Input new password'}))
+                                       attrs={'class': 'form-control'}))
 
     def __init__(self, *args, **kwargs):
         if 'request' in kwargs:
