@@ -28,36 +28,36 @@ class LoginForm(forms.Form):
 
 
 class RegForm(forms.Form):
-    username = forms.CharField(label='用户名',
+    username = forms.CharField(label='Username',
                                max_length=30,
                                min_length=3,
-                               widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'请输入3-30位用户名'}))
-    email = forms.EmailField(label='邮箱',
-                             widget=forms.EmailInput(attrs={'class':'form-control', 'placeholder':'请输入邮箱'}))
-    password = forms.CharField(label='密码',
+                               widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(label='Email',
+                             widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    password = forms.CharField(label='Password',
                                min_length=6,
-                               widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'请输入密码'}))
-    password_again = forms.CharField(label='再输入一次密码',
+                               widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder':'at least 6 characters'}))
+    password_again = forms.CharField(label='Password_again',
                                      min_length=6,
-                                     widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'再输入一次密码'}))
+                                     widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
     def clean_username(self):
         username = self.cleaned_data['username']
         if User.objects.filter(username=username).exists():
-            raise forms.ValidationError('用户名已存在')
+            raise forms.ValidationError('Username exists')
         return username
 
     def clean_email(self):
         email = self.cleaned_data['email']
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('邮箱已存在')
+            raise forms.ValidationError('Email exists')
         return email
 
     def clean_password_again(self):
         password = self.cleaned_data['password']
         password_again = self.cleaned_data['password_again']
         if password != password_again:
-            raise forms.ValidationError('两次输入的密码不一致')
+            raise forms.ValidationError('Password does not match')
         return password_again
 
 
