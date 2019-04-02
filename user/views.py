@@ -27,24 +27,23 @@ def login(request):
 
 def register(request):
     if request.method == 'POST':
-        reg_form = RegForm(request.POST, request=request)
+        reg_form = RegForm(request.POST)
         if reg_form.is_valid():
             username = reg_form.cleaned_data['username']
             email = reg_form.cleaned_data['email']
             password = reg_form.cleaned_data['password']
+            # 创建用户
             user = User.objects.create_user(username, email, password)
             user.save()
-
-            del request.session['register_code']
-
-            user = auth.authenticate(request, username=username, password=password)
+            # 登录用户
+            user = auth.authenticate(username=username, password=password)
             auth.login(request, user)
             return redirect(request.GET.get('from', reverse('home')))
-
     else:
-
         reg_form = RegForm()
-    context = {'reg_form': reg_form}
+
+    context = {}
+    context['reg_form'] = reg_form
     return render(request, 'user/register.html', context)
 
 

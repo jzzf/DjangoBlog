@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class LoginForm(forms.Form):
     username_or_email = forms.CharField(label='username or email', widget=forms.TextInput(
-        attrs={'class': 'form-control'}))
+        attrs={'class': 'form-control', 'placeholder': 'username'}))
     password = forms.CharField(label='password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
     def clean(self):
@@ -28,62 +28,37 @@ class LoginForm(forms.Form):
 
 
 class RegForm(forms.Form):
-    username = forms.CharField(
-        label='username',
-        max_length=20,
-        min_length=5,
-        widget=forms.TextInput(attrs={'class': 'form-control'}))
-    email = forms.CharField(
-        label='email',
-        widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    verification_code = forms.CharField(
-        label='Verify',
-        required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'click to send verification code'}))
-    password = forms.CharField(
-        label='password',
-        min_length=6,
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    password_again = forms.CharField(
-        label='password_again',
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-
-    def __init__(self, *args, **kwargs):
-        if 'request' in kwargs:
-            self.request = kwargs.pop('request')
-        super(RegForm, self).__init__(*args, **kwargs)
-
-    def clean(self):
-        code = self.request.session.get('register_code', '')
-        verification_code = self.cleaned_data.get('verification_code', '')
-        if not (code != '' and code == verification_code):
-            raise forms.ValidationError('Verification Code is wrong')
-        return self.cleaned_data
+    username = forms.CharField(label='用户名',
+                               max_length=30,
+                               min_length=3,
+                               widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'请输入3-30位用户名'}))
+    email = forms.EmailField(label='邮箱',
+                             widget=forms.EmailInput(attrs={'class':'form-control', 'placeholder':'请输入邮箱'}))
+    password = forms.CharField(label='密码',
+                               min_length=6,
+                               widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'请输入密码'}))
+    password_again = forms.CharField(label='再输入一次密码',
+                                     min_length=6,
+                                     widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'再输入一次密码'}))
 
     def clean_username(self):
         username = self.cleaned_data['username']
         if User.objects.filter(username=username).exists():
-            raise forms.ValidationError('Username has been used')
+            raise forms.ValidationError('用户名已存在')
         return username
 
     def clean_email(self):
         email = self.cleaned_data['email']
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Email has been used')
+            raise forms.ValidationError('邮箱已存在')
         return email
 
     def clean_password_again(self):
         password = self.cleaned_data['password']
         password_again = self.cleaned_data['password_again']
         if password != password_again:
-            raise forms.ValidationError('password does not match')
+            raise forms.ValidationError('两次输入的密码不一致')
         return password_again
-
-    def clear_verification_code(self):
-        verificatin_code = self.cleaned_data.get('verification_code', '')
-        if verificatin_code == '':
-            raise forms.ValidationError('Verification Code can not be blank')
-        return verificatin_code
 
 
 class ChangeNicknameForm(forms.Form):
@@ -186,16 +161,17 @@ class ChangePasswordForm(forms.Form):
 
 class ForgotPasswordForm(forms.Form):
     email = forms.EmailField(label='Email',
-                             widget=forms.EmailInput(attrs={'class': 'form-control'}))
+                             widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Input email'}))
 
     verification_code = forms.CharField(label='Verification code',
                                         required=False,
-                                        widget=forms.TextInput(attrs={'class': 'form-control'}))
+                                        widget=forms.TextInput(attrs={'class': 'form-control',
+                                                                      'placeholder': 'click to send verification code'}))
 
     new_password = forms.CharField(label='new password',
                                    max_length=20,
                                    widget=forms.TextInput(
-                                       attrs={'class': 'form-control'}))
+                                       attrs={'class': 'form-control', 'placeholder': 'Input new password'}))
 
     def __init__(self, *args, **kwargs):
         if 'request' in kwargs:

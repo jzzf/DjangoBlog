@@ -2,38 +2,30 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container" style="margin-top: 70px; margin-bottom: 70px">
+    <div class="containter" style="margin-top: 70px; margin-bottom: 70px;">
         <div class="row">
             <div class="col">
 
             </div>
             <div class="col">
-                <div class="card">
-                    <div class="card-header">Login</div>
-                    <div class="card-body">
-                        {% if user.is_authenticated %}
-                            <h2>{{ user.username }}</h2>
-                            <ul>
-                                <li>昵称 {{ user.get_nickname }}<a href="{% url 'change_nickname' %}?from={{ request.get_full_path }}">修改昵称</a></li>
-                                <li>Email: {% if user.email %}{{ user.email }}{% else %}未绑定 <a href="{% url 'bind_email' %}?from={{ request.get_full_path }}">绑定邮箱</a> {% endif %}</li>
-                                <li>Last login: {{ user.last_login|date:"Y-m-d H:i:s" }}</li>
-                                <li><a href="{% url 'change_password' %}">修改密码</a></li>
-                            </ul>
-                        {% else %}
-                            <span>未登录，跳转到首页</span>
-                            <script type="text/javascript">
-                                window.location.href = '/';
-                            </script>
-                        {% endif %}
-                    </div>
-                </div>
+                {% if user.is_authenticated %}
+                    <h2>{{ user.username }}</h2>
+                    <ul style="list-style-type: none;">
+                        <li>Nickname：{{ user.get_nickname }} <a href="{% url 'change_nickname' %}?from={{ request.get_full_path }}">Change Nickname</a></li>
+                        <li>Email：{% if user.email %}{{ user.email }}{% else %}Not Bind <a href="{% url 'bind_email' %}?from={{ request.get_full_path }}">Bind Email</a>{% endif %}</li>
+                        <li>Last Login：{{ user.last_login|date:"Y-m-d H:i:s" }}</li>
+                        <li><a href="{% url 'change_password' %}">Change Password</a></li>
+                    </ul>
+                {% else %}
+                    <span>Not login, redirect to home...</span>
+                    <script type="text/javascript">
+                        window.location.href = '/';
+                    </script>
+                {% endif %}
             </div>
             <div class="col">
 
             </div>
-
         </div>
     </div>
-
-
 {% endblock %}

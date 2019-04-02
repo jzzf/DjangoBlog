@@ -23,7 +23,7 @@
                                 {% endfor %}
                                 <span class="text-danger">{{ reg_form.non_field_errors }}</span>
                                 <div class="clearfix"></div>
-                                <button id="send_code" class="btn btn-primary float-left">Verify</button>
+                                <button id="send_code" class="btn btn-light float-left">Verify</button>
                                 <input type="submit" name="Register" class="btn btn-light float-right">
                             </form>
                         </div>
@@ -59,7 +59,7 @@
                 cache: false,
                 data: {
                     'email:': email,
-                    'send_for': 'register_code
+                    'send_for': 'register_code'
                     },
                 success: function(data){
                     if(data['status']==ERROR){
