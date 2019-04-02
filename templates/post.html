@@ -81,7 +81,7 @@
                                     <div id="root_{{ comment.pk }}">
                                         <div class="comment-header d-flex justify-content-between">
                                             <div class="user d-flex align-items-center">
-                                                <div class="image"><img src="{% static 'img/user.svg' %}" alt="..." class="img-fluid rounded-circle"></div>
+                                                <div class="image"><img src="{{ post.author.profile_picture.url }}" alt="..." class="img-fluid rounded-circle"></div>
                                                 <div class="title"><strong>{{ comment.user.username }}</strong><span class="date">{{ comment.comment_time }}</span></div>
                                             </div>
                                         </div>
@@ -95,7 +95,7 @@
                                             <div class="reply">
                                                 <div class="comment-header d-flex justify-content-between">
                                                     <div class="user d-flex align-items-center">
-                                                        <div class="image"><img src="{% static 'img/user.svg' %}" alt="..." class="img-fluid rounded-circle"></div>
+                                                        <div class="image"><img src="{{ post.author.profile_picture.url }}" alt="..." class="img-fluid rounded-circle"></div>
                                                         <div class="title"><strong>{{ reply.user.username }}</strong><span class="date">{{ reply.comment_time }}</span></div>
                                                     </div>
                                                 </div>
